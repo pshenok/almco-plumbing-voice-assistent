@@ -1,0 +1,54 @@
+{
+  "name": "Almco Plumbing Voice Agent",
+  "firstMessage": "Hey, thanks for calling Almco Plumbing! This is Sarah. How can I help you today?",
+  "firstMessageMode": "assistant-speaks-first",
+
+  "transcriber": {
+    "provider": "deepgram",
+    "model": "nova-3",
+    "language": "en",
+    "smartFormat": true,
+    "endpointing": 255
+  },
+
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "temperature": 0.5,
+    "maxTokens": 150,
+    "messages": [
+      {
+        "role": "system",
+        "content": "__PROMPT_PLACEHOLDER__"
+      }
+    ]
+  },
+
+  "voice": {
+    "provider": "11labs",
+    "voiceId": "21m00Tcm4TlvDq8ikWAM",
+    "model": "eleven_flash_v2_5",
+    "stability": 0.5,
+    "similarityBoost": 0.75,
+    "style": 0.0,
+    "optimizeStreamingLatency": 4
+  },
+
+  "silenceTimeoutSeconds": 30,
+  "maxDurationSeconds": 600,
+  "backgroundSound": "off",
+  "responseDelaySeconds": 0.0,
+  "llmRequestDelaySeconds": 0.0,
+  "numWordsToInterruptAssistant": 2,
+  "endCallMessage": "Thank you for calling Almco Plumbing. We look forward to helping you. Have a great day!",
+
+  "startSpeakingPlan": {
+    "waitSeconds": 0.4
+  },
+
+  "stopSpeakingPlan": {
+    "numWords": 2,
+    "voiceSeconds": 0.2,
+    "backoffSeconds": 1.0
+  }
+}
