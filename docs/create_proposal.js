@@ -10,413 +10,279 @@ const ACCENT_LIGHT = "D4E6F1";
 const ACCENT_MED = "2E86C1";
 const GRAY = "F2F3F4";
 const WHITE = "FFFFFF";
-const BLACK = "000000";
 const DARK = "2C3E50";
+const GREEN = "27AE60";
+const RED = "E74C3C";
+const ORANGE = "E67E22";
 
 const border = { style: BorderStyle.SINGLE, size: 1, color: "D5D8DC" };
 const borders = { top: border, bottom: border, left: border, right: border };
-const noBorders = {
-  top: { style: BorderStyle.NONE, size: 0 },
-  bottom: { style: BorderStyle.NONE, size: 0 },
-  left: { style: BorderStyle.NONE, size: 0 },
-  right: { style: BorderStyle.NONE, size: 0 },
-};
+const noBorders = { top: { style: BorderStyle.NONE, size: 0 }, bottom: { style: BorderStyle.NONE, size: 0 }, left: { style: BorderStyle.NONE, size: 0 }, right: { style: BorderStyle.NONE, size: 0 } };
 const cellMargins = { top: 80, bottom: 80, left: 120, right: 120 };
 
-function headerCell(text, width) {
-  return new TableCell({
-    borders,
-    width: { size: width, type: WidthType.DXA },
-    shading: { fill: ACCENT, type: ShadingType.CLEAR },
-    margins: cellMargins,
-    verticalAlign: "center",
-    children: [new Paragraph({ alignment: AlignmentType.LEFT, children: [new TextRun({ text, bold: true, color: WHITE, font: "Arial", size: 20 })] })],
-  });
+function hCell(text, width) {
+  return new TableCell({ borders, width: { size: width, type: WidthType.DXA }, shading: { fill: ACCENT, type: ShadingType.CLEAR }, margins: cellMargins, verticalAlign: "center",
+    children: [new Paragraph({ children: [new TextRun({ text, bold: true, color: WHITE, font: "Arial", size: 20 })] })] });
 }
-
-function dataCell(text, width, opts = {}) {
-  return new TableCell({
-    borders,
-    width: { size: width, type: WidthType.DXA },
-    shading: opts.shading ? { fill: opts.shading, type: ShadingType.CLEAR } : undefined,
-    margins: cellMargins,
-    verticalAlign: "center",
-    children: [new Paragraph({ alignment: opts.align || AlignmentType.LEFT, children: [new TextRun({ text, font: "Arial", size: 20, bold: !!opts.bold, color: opts.color || DARK })] })],
-  });
+function dCell(text, width, o = {}) {
+  return new TableCell({ borders, width: { size: width, type: WidthType.DXA }, shading: o.bg ? { fill: o.bg, type: ShadingType.CLEAR } : undefined, margins: cellMargins, verticalAlign: "center",
+    children: [new Paragraph({ alignment: o.align || AlignmentType.LEFT, children: [new TextRun({ text, font: "Arial", size: 20, bold: !!o.bold, color: o.color || DARK, italics: !!o.i })] })] });
 }
-
-function spacer(h = 100) {
-  return new Paragraph({ spacing: { before: h, after: h }, children: [] });
+function spacer(h=100) { return new Paragraph({ spacing: { before: h, after: h }, children: [] }); }
+function h1(text) { return new Paragraph({ heading: HeadingLevel.HEADING_1, spacing: { before: 300, after: 200 }, children: [new TextRun({ text, font: "Arial", bold: true, color: ACCENT, size: 32 })] }); }
+function h2(text) { return new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 160 }, children: [new TextRun({ text, font: "Arial", bold: true, color: ACCENT, size: 26 })] }); }
+function p(text, o={}) { return new Paragraph({ spacing: { after: 120 }, alignment: o.align || AlignmentType.LEFT, children: [new TextRun({ text, font: "Arial", size: 20, color: o.color || DARK, bold: !!o.bold, italics: !!o.i })] }); }
+function bullet(text) { return new Paragraph({ numbering: { reference: "bullets", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text, font: "Arial", size: 20, color: DARK })] }); }
+function num(text, ref="numbers") { return new Paragraph({ numbering: { reference: ref, level: 0 }, spacing: { after: 80 }, children: [new TextRun({ text, font: "Arial", size: 20, color: DARK })] }); }
+function line() { return new Paragraph({ spacing: { before: 100, after: 100 }, border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: ACCENT_MED, space: 1 } }, children: [] }); }
+function kpi(items) {
+  const w = Math.floor(9360 / items.length);
+  return new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: items.map(() => w), rows: [
+    new TableRow({ children: items.map(([n, l]) => new TableCell({ borders: noBorders, width: { size: w, type: WidthType.DXA }, shading: { fill: ACCENT_LIGHT, type: ShadingType.CLEAR }, margins: { top: 200, bottom: 200, left: 150, right: 150 },
+      children: [ new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: n, font: "Arial", size: 40, bold: true, color: ACCENT })] }),
+                   new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: l, font: "Arial", size: 18, color: DARK })] }) ] })) })
+  ] });
 }
+function pb() { return new Paragraph({ children: [new PageBreak()] }); }
 
-function heading(text, level = HeadingLevel.HEADING_1) {
-  return new Paragraph({ heading: level, spacing: { before: 300, after: 200 }, children: [new TextRun({ text, font: "Arial", bold: true, color: ACCENT, size: level === HeadingLevel.HEADING_1 ? 32 : 26 })] });
-}
-
-function para(text, opts = {}) {
-  return new Paragraph({
-    spacing: { after: 120 },
-    alignment: opts.align || AlignmentType.LEFT,
-    children: [new TextRun({ text, font: "Arial", size: 20, color: opts.color || DARK, bold: !!opts.bold, italics: !!opts.italics })],
-  });
-}
-
-function bulletItem(text) {
-  return new Paragraph({
-    numbering: { reference: "bullets", level: 0 },
-    spacing: { after: 60 },
-    children: [new TextRun({ text, font: "Arial", size: 20, color: DARK })],
-  });
-}
-
-function numberItem(text) {
-  return new Paragraph({
-    numbering: { reference: "numbers", level: 0 },
-    spacing: { after: 80 },
-    children: [new TextRun({ text, font: "Arial", size: 20, color: DARK })],
-  });
-}
-
-function accentLine() {
-  return new Paragraph({
-    spacing: { before: 100, after: 100 },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: ACCENT_MED, space: 1 } },
-    children: [],
-  });
-}
-
-// ─── KPI highlight box ───
-function kpiRow(items) {
-  const colW = Math.floor(9360 / items.length);
-  return new Table({
-    width: { size: 9360, type: WidthType.DXA },
-    columnWidths: items.map(() => colW),
-    rows: [
-      new TableRow({
-        children: items.map(([num, label]) =>
-          new TableCell({
-            borders: noBorders,
-            width: { size: colW, type: WidthType.DXA },
-            shading: { fill: ACCENT_LIGHT, type: ShadingType.CLEAR },
-            margins: { top: 200, bottom: 200, left: 150, right: 150 },
-            children: [
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: num, font: "Arial", size: 40, bold: true, color: ACCENT })] }),
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: label, font: "Arial", size: 18, color: DARK })] }),
-            ],
-          })
-        ),
-      }),
-    ],
-  });
-}
-
-// ─── Build document ───
 const doc = new Document({
   styles: {
     default: { document: { run: { font: "Arial", size: 20 } } },
     paragraphStyles: [
-      { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
-        run: { size: 32, bold: true, font: "Arial", color: ACCENT },
-        paragraph: { spacing: { before: 300, after: 200 }, outlineLevel: 0 } },
-      { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true,
-        run: { size: 26, bold: true, font: "Arial", color: ACCENT },
-        paragraph: { spacing: { before: 240, after: 160 }, outlineLevel: 1 } },
+      { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 32, bold: true, font: "Arial", color: ACCENT }, paragraph: { spacing: { before: 300, after: 200 }, outlineLevel: 0 } },
+      { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 26, bold: true, font: "Arial", color: ACCENT }, paragraph: { spacing: { before: 240, after: 160 }, outlineLevel: 1 } },
     ],
   },
-  numbering: {
-    config: [
-      { reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "\u2022", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
-      { reference: "numbers", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
-      { reference: "numbers2", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
-      { reference: "numbers3", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
-    ],
-  },
+  numbering: { config: [
+    { reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "\u2022", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
+    { reference: "numbers", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
+    { reference: "numbers2", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
+    { reference: "numbers3", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
+  ] },
   sections: [
-    // ═══════════ PAGE 1: TITLE ═══════════
-    {
-      properties: {
-        page: {
-          size: { width: 12240, height: 15840 },
-          margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 },
-        },
-      },
+    // ═══════════ TITLE PAGE ═══════════
+    { properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } },
       children: [
         spacer(2000),
         new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "ALMCO PLUMBING INC.", font: "Arial", size: 22, color: ACCENT_MED, bold: true })] }),
-        accentLine(),
-        spacer(400),
+        line(), spacer(400),
         new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: "AI Voice Agent", font: "Arial", size: 52, bold: true, color: ACCENT })] }),
-        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "+", font: "Arial", size: 36, color: ACCENT_MED })] }),
-        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: "ServiceTitan Integration", font: "Arial", size: 52, bold: true, color: ACCENT })] }),
-        spacer(200),
-        accentLine(),
-        spacer(200),
-        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: "Commercial Proposal", font: "Arial", size: 28, color: DARK, italics: true })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "Full-Service Virtual Receptionist", font: "Arial", size: 28, color: ACCENT_MED })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: "with ServiceTitan Integration", font: "Arial", size: 28, color: ACCENT_MED })] }),
+        spacer(200), line(), spacer(200),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: "Scope of Work & Commercial Proposal", font: "Arial", size: 28, color: DARK, italics: true })] }),
         new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: "April 2026", font: "Arial", size: 22, color: DARK })] }),
-        spacer(1600),
+        spacer(1400),
         new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Prepared by InLeads AI", font: "Arial", size: 20, color: ACCENT_MED })] }),
         new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "San Diego, California", font: "Arial", size: 20, color: ACCENT_MED })] }),
       ],
     },
 
-    // ═══════════ PAGE 2+: CONTENT ═══════════
-    {
-      properties: {
-        page: {
-          size: { width: 12240, height: 15840 },
-          margin: { top: 1440, right: 1440, bottom: 1080, left: 1440 },
-        },
-      },
-      headers: {
-        default: new Header({
-          children: [new Paragraph({
-            border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: ACCENT_MED, space: 4 } },
-            children: [
-              new TextRun({ text: "Almco Plumbing \u2014 AI Voice Agent Proposal", font: "Arial", size: 16, color: ACCENT_MED, italics: true }),
-            ],
-            tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-          })],
-        }),
-      },
-      footers: {
-        default: new Footer({
-          children: [new Paragraph({
-            alignment: AlignmentType.CENTER,
-            children: [
-              new TextRun({ text: "Page ", font: "Arial", size: 16, color: "999999" }),
-              new TextRun({ children: [PageNumber.CURRENT], font: "Arial", size: 16, color: "999999" }),
-            ],
-          })],
-        }),
-      },
+    // ═══════════ CONTENT ═══════════
+    { properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1080, left: 1440 } } },
+      headers: { default: new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: ACCENT_MED, space: 4 } }, children: [new TextRun({ text: "Almco Plumbing \u2014 AI Voice Agent \u2014 Scope & Pricing", font: "Arial", size: 16, color: ACCENT_MED, italics: true })] })] }) },
+      footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Page ", font: "Arial", size: 16, color: "999999" }), new TextRun({ children: [PageNumber.CURRENT], font: "Arial", size: 16, color: "999999" })] })] }) },
       children: [
-        // ── EXECUTIVE SUMMARY ──
-        heading("1. Executive Summary"),
-        para("Almco Plumbing Inc. is a premium residential plumbing company in San Diego specializing in sewer diagnostics and trenchless repair. This proposal outlines a fully automated AI voice agent integrated with ServiceTitan CRM to handle inbound calls 24/7, book jobs in real-time, and eliminate missed revenue."),
-        spacer(100),
-        kpiRow([
-          ["74%", "Plumbing calls go\nunanswered (industry avg)"],
-          ["$125K+", "Annual revenue lost\nfrom missed calls"],
-          ["92%", "AI agent booking rate\n(proven benchmark)"],
-          ["1,400%+", "ROI on AI voice\nimplementation"],
-        ]),
+
+        // ── 1. WHAT WE BUILD ──
+        h1("1. What We Build"),
+        p("A fully autonomous AI receptionist that answers every inbound call to Almco Plumbing 24/7/365. The agent sounds like a real American English-speaking employee, handles customer inquiries, negotiates pricing within approved ranges, books appointments directly into your calendar, and transfers to a live operator on demand."),
+        spacer(50),
+        kpi([ ["24/7", "Availability\nno missed calls"], ["<1s", "Answer time\nno hold music"], ["$0", "Per-call fees\nflat monthly"] ]),
         spacer(200),
 
-        // ── PROBLEM ──
-        heading("2. The Problem: Missed Calls = Lost Revenue"),
-        para("The home services industry faces a critical challenge: customers who call and don't get an answer almost never call back. For plumbing companies, the numbers are alarming:"),
+        // ── 2. AGENT CAPABILITIES ──
+        h1("2. Agent Capabilities \u2014 Full Feature List"),
         spacer(50),
-        new Table({
-          width: { size: 9360, type: WidthType.DXA },
-          columnWidths: [5600, 3760],
-          rows: [
-            new TableRow({ children: [headerCell("Metric", 5600), headerCell("Data", 3760)] }),
-            new TableRow({ children: [dataCell("Plumbing calls that go unanswered", 5600), dataCell("74%", 3760, { bold: true, color: "E74C3C" })] }),
-            new TableRow({ children: [dataCell("Callers who never retry after voicemail", 5600, { shading: GRAY }), dataCell("85%", 3760, { bold: true, color: "E74C3C", shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Emergencies occurring after business hours", 5600), dataCell("62%", 3760, { bold: true })] }),
-            new TableRow({ children: [dataCell("Customers who choose the first company to respond", 5600, { shading: GRAY }), dataCell("78%", 3760, { bold: true, shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Average emergency plumbing call value", 5600), dataCell("$450 \u2013 $600", 3760, { bold: true })] }),
-            new TableRow({ children: [dataCell("Estimated annual revenue loss from missed calls", 5600, { shading: GRAY }), dataCell("$125,000 \u2013 $247,000", 3760, { bold: true, color: "E74C3C", shading: GRAY })] }),
-          ],
-        }),
-        spacer(100),
-        para("Every missed call is a customer choosing your competitor instead.", { italics: true }),
 
-        // ── SOLUTION ──
-        heading("3. The Solution: AI Voice Agent + ServiceTitan"),
-        para("We deploy a human-sounding AI voice agent that answers every call within 100 milliseconds, 24 hours a day, 7 days a week. The agent is fully integrated with ServiceTitan to look up customers, check availability, and book jobs in real-time \u2014 no human intervention required."),
-        spacer(100),
-
-        heading("3.1 What the Agent Does During a Call", HeadingLevel.HEADING_2),
-        numberItem("Answers instantly \u2014 no hold times, no voicemail, no missed calls"),
-        numberItem("Identifies returning customers by phone number from ServiceTitan"),
-        numberItem("Pulls complete service history, address, and membership status"),
-        numberItem("Understands the plumbing issue through natural conversation"),
-        numberItem("Checks real-time technician availability via ServiceTitan Scheduling Pro"),
-        numberItem("Books the job directly into ServiceTitan dispatch board"),
-        numberItem("Confirms appointment details and sends SMS confirmation automatically"),
-        numberItem("Logs full call transcript and summary into the job record"),
-        spacer(100),
-
-        heading("3.2 What Happens After the Call", HeadingLevel.HEADING_2),
-        bulletItem("Call recording and AI transcript pushed to ServiceTitan"),
-        bulletItem("Marketing attribution tracked (source campaign, channel)"),
-        bulletItem("Post-call analysis: sentiment, outcome, and summary generated"),
-        bulletItem("Follow-up tasks created for unbooked leads"),
-        spacer(100),
-
-        heading("3.3 Proactive Outbound Capabilities", HeadingLevel.HEADING_2),
-        bulletItem("Membership renewal calls for expiring customers"),
-        bulletItem("Appointment reminder and confirmation calls"),
-        bulletItem("Follow-up on unbooked estimates"),
-        bulletItem("Seasonal maintenance campaign outreach"),
-
-        new Paragraph({ children: [new PageBreak()] }),
-
-        // ── SERVICETITAN INTEGRATION ──
-        heading("4. ServiceTitan Integration \u2014 Technical Scope"),
-        para("The integration connects to 7 ServiceTitan API namespaces via OAuth 2.0 authentication:"),
+        h2("2.1 Inbound Call Handling"),
+        bullet("Answers every call instantly \u2014 no voicemail, no hold, no missed calls"),
+        bullet("Speaks clean, natural American English \u2014 indistinguishable from a live receptionist"),
+        bullet("Uses natural filler words, backchannel responses, and dynamic speech pacing"),
+        bullet("Ambient call-center background sound for realistic phone experience"),
         spacer(50),
-        new Table({
-          width: { size: 9360, type: WidthType.DXA },
-          columnWidths: [2800, 3800, 2760],
-          rows: [
-            new TableRow({ children: [headerCell("API Module", 2800), headerCell("Capability", 3800), headerCell("Priority", 2760)] }),
-            new TableRow({ children: [dataCell("CRM", 2800, { bold: true }), dataCell("Customer lookup, create, update, contacts, locations", 3800), dataCell("CRITICAL", 2760, { bold: true, color: "E74C3C" })] }),
-            new TableRow({ children: [dataCell("Job Planning", 2800, { bold: true, shading: GRAY }), dataCell("Create jobs, bookings, job types, call reasons, notes", 3800, { shading: GRAY }), dataCell("CRITICAL", 2760, { bold: true, color: "E74C3C", shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Scheduling Pro", 2800, { bold: true }), dataCell("Real-time available time slots and windows", 3800), dataCell("CRITICAL", 2760, { bold: true, color: "E74C3C" })] }),
-            new TableRow({ children: [dataCell("Dispatch", 2800, { bold: true, shading: GRAY }), dataCell("Technician availability, zones, assignments", 3800, { shading: GRAY }), dataCell("HIGH", 2760, { bold: true, color: "E67E22", shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Memberships", 2800, { bold: true }), dataCell("Check/create membership, recurring services", 3800), dataCell("HIGH", 2760, { bold: true, color: "E67E22" })] }),
-            new TableRow({ children: [dataCell("Telecom", 2800, { bold: true, shading: GRAY }), dataCell("Push call logs, recordings, transcripts", 3800, { shading: GRAY }), dataCell("HIGH", 2760, { bold: true, color: "E67E22", shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Accounting", 2800, { bold: true }), dataCell("Invoice lookup, payment status", 3800), dataCell("MEDIUM", 2760, { bold: true, color: "27AE60" })] }),
-          ],
-        }),
-        spacer(100),
 
-        heading("4.1 Data Flow Architecture", HeadingLevel.HEADING_2),
-        para("Inbound Call \u2192 AI Voice Agent \u2192 ServiceTitan API \u2192 Job Booked \u2192 SMS Sent", { bold: true }),
+        h2("2.2 Service Consultation"),
+        bullet("Explains all Almco services in plain language: sewer camera inspection, hydrojetting, trenchless repair (epoxy lining), pipe bursting, general plumbing, leak detection, water heaters, repiping"),
+        bullet("Trained on complete Almco knowledge base (company docs, service manuals, pricing policies)"),
+        bullet("Answers questions about process, timeline, and what to expect"),
+        bullet("Explains the $79 diagnostic fee and how it gets credited toward repairs"),
+        bullet("Offers free sewer camera inspection for qualifying homes (pre-1970)"),
         spacer(50),
-        numberItem("Call arrives \u2192 AI answers in <100ms"),
-        numberItem("GET /crm/customers?phone={caller} \u2192 Customer identified"),
-        numberItem("GET /memberships \u2192 Membership status checked"),
-        numberItem("GET /schedulingpro/sessions \u2192 Available slots retrieved"),
-        numberItem("POST /jbp/jobs \u2192 Job created in dispatch board"),
-        numberItem("POST /telecom/calls \u2192 Call log + transcript pushed"),
-        numberItem("ServiceTitan auto-sends SMS confirmation to customer"),
 
-        new Paragraph({ children: [new PageBreak()] }),
-
-        // ── VOICE TECHNOLOGY ──
-        heading("5. Voice Technology Stack"),
-        para("We deploy on two platforms simultaneously for A/B testing and maximum reliability:"),
+        h2("2.3 Pricing Negotiation & Discounts"),
+        bullet("Quotes standard pricing for each service category"),
+        bullet("Authorized to offer discounts within a pre-configured range (e.g., 5\u201315%)"),
+        bullet("Discount triggers configurable: first-time customer, membership signup, bundled services, seasonal promotions"),
+        bullet("Never goes below the minimum approved price floor"),
+        bullet("Escalates to a live operator if the customer pushes beyond the discount range"),
         spacer(50),
-        new Table({
-          width: { size: 9360, type: WidthType.DXA },
-          columnWidths: [2400, 3480, 3480],
-          rows: [
-            new TableRow({ children: [headerCell("Component", 2400), headerCell("Platform A: VAPI", 3480), headerCell("Platform B: Retell AI", 3480)] }),
-            new TableRow({ children: [dataCell("Voice Engine", 2400, { bold: true }), dataCell("ElevenLabs Sarah (Flash v2.5)", 3480), dataCell("ElevenLabs Anna (v3)", 3480)] }),
-            new TableRow({ children: [dataCell("LLM", 2400, { bold: true, shading: GRAY }), dataCell("GPT-4o", 3480, { shading: GRAY }), dataCell("GPT-4o", 3480, { shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Transcriber", 2400, { bold: true }), dataCell("Deepgram Nova-3", 3480), dataCell("Deepgram (built-in)", 3480)] }),
-            new TableRow({ children: [dataCell("Latency", 2400, { bold: true, shading: GRAY }), dataCell("~700ms end-to-end", 3480, { shading: GRAY }), dataCell("~620ms end-to-end", 3480, { shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Backchannel", 2400, { bold: true }), dataCell("Automatic", 3480), dataCell("Customizable words + frequency", 3480)] }),
-            new TableRow({ children: [dataCell("Filler Words", 2400, { bold: true, shading: GRAY }), dataCell("Automatic injection", 3480, { shading: GRAY }), dataCell("Natural filler + empathy presets", 3480, { shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Ambient Sound", 2400, { bold: true }), dataCell("Configurable", 3480), dataCell("Call-center ambient at 25%", 3480)] }),
-          ],
-        }),
-        spacer(100),
-        para("Both agents use the same knowledge base, prompt, and call flow \u2014 only the voice engine differs. After testing, we keep the best-performing platform as primary and the other as fallback."),
 
-        // ── COMPETITIVE LANDSCAPE ──
-        heading("6. Competitive Landscape"),
-        para("Several companies offer voice AI for ServiceTitan. Here is how our solution compares:"),
+        h2("2.4 Appointment Booking"),
+        bullet("Checks real-time availability via calendar integration (Google Calendar, ServiceTitan Scheduling Pro, or custom)"),
+        bullet("Offers the customer 2\u20133 available time slots"),
+        bullet("Books the appointment and confirms date, time, address, and service type"),
+        bullet("Sends automatic SMS/email confirmation to the customer"),
+        bullet("Handles rescheduling and cancellation requests"),
         spacer(50),
-        new Table({
-          width: { size: 9360, type: WidthType.DXA },
-          columnWidths: [2100, 1600, 1800, 1800, 2060],
-          rows: [
-            new TableRow({ children: [headerCell("Provider", 2100), headerCell("Pricing", 1600), headerCell("Voice Quality", 1800), headerCell("ST Integration", 1800), headerCell("Customization", 2060)] }),
-            new TableRow({ children: [dataCell("ServiceTitan (native)", 2100, { bold: true }), dataCell("$2.75/call", 1600), dataCell("Good", 1800), dataCell("Deepest", 1800), dataCell("Limited", 2060)] }),
-            new TableRow({ children: [dataCell("Avoca AI", 2100, { bold: true, shading: GRAY }), dataCell("Custom", 1600, { shading: GRAY }), dataCell("Good", 1800, { shading: GRAY }), dataCell("Marketplace", 1800, { shading: GRAY }), dataCell("Medium", 2060, { shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Sameday AI", 2100, { bold: true }), dataCell("Custom", 1600), dataCell("Good", 1800), dataCell("Marketplace", 1800), dataCell("Medium", 2060)] }),
-            new TableRow({ children: [dataCell("Our Solution", 2100, { bold: true, color: ACCENT, shading: ACCENT_LIGHT }), dataCell("Flat monthly", 1600, { shading: ACCENT_LIGHT }), dataCell("Premium (EL v3)", 1800, { bold: true, shading: ACCENT_LIGHT }), dataCell("Full API", 1800, { shading: ACCENT_LIGHT }), dataCell("Fully custom", 2060, { bold: true, shading: ACCENT_LIGHT })] }),
-          ],
-        }),
-        spacer(50),
-        para("Our advantage: fully custom prompt engineering, A/B tested voices, no per-call fees, and complete ownership of the solution."),
 
-        new Paragraph({ children: [new PageBreak()] }),
-
-        // ── ROI ──
-        heading("7. Expected Results & ROI"),
+        h2("2.5 Live Operator Transfer"),
+        bullet("Transfers to a real person instantly when the customer requests it"),
+        bullet("Transfer trigger: customer says \"let me speak to someone\", \"talk to a person\", \"connect me to a manager\", or similar"),
+        bullet("Warm transfer \u2014 agent briefs the operator on the customer's issue before handing off"),
+        bullet("Configurable transfer number (office line, mobile, or call queue)"),
+        bullet("If no operator available, takes a detailed message and schedules a callback"),
         spacer(50),
-        kpiRow([
-          ["35+", "Additional emergency\ncalls captured/month"],
-          ["$47K+", "Direct revenue from\nafter-hours leads (3 mo)"],
-          ["70%", "Booking rate for\nall inbound calls"],
-        ]),
+
+        h2("2.6 After-Call Processing"),
+        bullet("Full call transcript and AI-generated summary saved"),
+        bullet("Call recording stored and accessible from dashboard"),
+        bullet("Customer sentiment analysis (positive / neutral / negative)"),
+        bullet("Lead categorization: hot, warm, cold"),
+        bullet("All data pushed to ServiceTitan CRM automatically"),
+
+        pb(),
+
+        // ── 3. SERVICETITAN INTEGRATION ──
+        h1("3. ServiceTitan Integration"),
+        p("The agent connects to ServiceTitan via REST API (OAuth 2.0) to operate as a fully integrated member of your dispatch team:"),
+        spacer(50),
+        new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: [3200, 6160], rows: [
+          new TableRow({ children: [hCell("Integration Point", 3200), hCell("What It Does", 6160)] }),
+          new TableRow({ children: [dCell("Customer Lookup", 3200, { bold: true }), dCell("Instantly identifies returning customers by phone number. Pulls name, address, service history, and membership status.", 6160)] }),
+          new TableRow({ children: [dCell("New Customer Creation", 3200, { bold: true, bg: GRAY }), dCell("Creates new customer and location records in ServiceTitan when a first-time caller books.", 6160, { bg: GRAY })] }),
+          new TableRow({ children: [dCell("Real-Time Scheduling", 3200, { bold: true }), dCell("Queries available time slots from Scheduling Pro and books directly into the dispatch board.", 6160)] }),
+          new TableRow({ children: [dCell("Job Creation", 3200, { bold: true, bg: GRAY }), dCell("Creates jobs with correct job type, call reason, and appointment window. Dispatch board updates automatically.", 6160, { bg: GRAY })] }),
+          new TableRow({ children: [dCell("Membership Check", 3200, { bold: true }), dCell("Verifies active membership, applies benefits and priority scheduling for members.", 6160)] }),
+          new TableRow({ children: [dCell("Call Logging", 3200, { bold: true, bg: GRAY }), dCell("Pushes call recording, transcript, and AI summary as a note on the job record.", 6160, { bg: GRAY })] }),
+          new TableRow({ children: [dCell("Marketing Attribution", 3200, { bold: true }), dCell("Tracks call source for ROI reporting. Every AI-booked job is tagged with campaign data.", 6160)] }),
+        ] }),
+        spacer(50),
+        p("ServiceTitan auto-sends SMS booking confirmation to the customer \u2014 no additional setup needed.", { i: true }),
+
+        pb(),
+
+        // ── 4. PRICING ──
+        h1("4. Pricing"),
+        spacer(50),
+        new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: [4680, 4680], rows: [
+          new TableRow({ children: [
+            new TableCell({ borders: noBorders, width: { size: 4680, type: WidthType.DXA }, shading: { fill: ACCENT, type: ShadingType.CLEAR }, margins: { top: 300, bottom: 300, left: 300, right: 300 },
+              children: [
+                new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "One-Time Setup", font: "Arial", size: 22, color: ACCENT_LIGHT })] }),
+                new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 100 }, children: [new TextRun({ text: "$5,000", font: "Arial", size: 52, bold: true, color: WHITE })] }),
+                new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 50 }, children: [new TextRun({ text: "Full integration & deployment", font: "Arial", size: 18, color: ACCENT_LIGHT })] }),
+              ] }),
+            new TableCell({ borders: noBorders, width: { size: 4680, type: WidthType.DXA }, shading: { fill: ACCENT_MED, type: ShadingType.CLEAR }, margins: { top: 300, bottom: 300, left: 300, right: 300 },
+              children: [
+                new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Monthly Support", font: "Arial", size: 22, color: ACCENT_LIGHT })] }),
+                new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 100 }, children: [new TextRun({ text: "$500/mo", font: "Arial", size: 52, bold: true, color: WHITE })] }),
+                new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 50 }, children: [new TextRun({ text: "Maintenance, updates & optimization", font: "Arial", size: 18, color: ACCENT_LIGHT })] }),
+              ] }),
+          ] }),
+        ] }),
         spacer(200),
 
-        heading("7.1 Case Studies from Industry", HeadingLevel.HEADING_2),
-        spacer(50),
-        new Table({
-          width: { size: 9360, type: WidthType.DXA },
-          columnWidths: [2600, 3400, 3360],
-          rows: [
-            new TableRow({ children: [headerCell("Company", 2600), headerCell("Before AI", 3400), headerCell("After AI", 3360)] }),
-            new TableRow({ children: [dataCell("Top Flight Electric", 2600, { bold: true }), dataCell("10% booking rate", 3400), dataCell("70% booking rate, +$170K revenue", 3360, { bold: true, color: "27AE60" })] }),
-            new TableRow({ children: [dataCell("Aire Serv", 2600, { bold: true, shading: GRAY }), dataCell("58 after-hours bookings", 3400, { shading: GRAY }), dataCell("208 after-hours bookings", 3360, { bold: true, color: "27AE60", shading: GRAY })] }),
-            new TableRow({ children: [dataCell("HL Bowman", 2600, { bold: true }), dataCell("Manual call handling", 3400), dataCell("70% calls handled by AI, 93% satisfaction", 3360, { bold: true, color: "27AE60" })] }),
-            new TableRow({ children: [dataCell("TX Plumbing Co.", 2600, { bold: true, shading: GRAY }), dataCell("Missed after-hours calls", 3400, { shading: GRAY }), dataCell("2,000+ calls handled, 450+ jobs booked (3 mo)", 3360, { bold: true, color: "27AE60", shading: GRAY })] }),
-          ],
-        }),
+        h2("4.1 What's Included in Setup ($5,000)"),
+        num("AI voice agent development, prompt engineering, and knowledge base training", "numbers2"),
+        num("A/B testing across two voice platforms (VAPI + Retell AI) to select the best-sounding agent", "numbers2"),
+        num("Full ServiceTitan API integration (customer lookup, job booking, scheduling, call logging)", "numbers2"),
+        num("Calendar integration for real-time appointment booking", "numbers2"),
+        num("Pricing negotiation logic with configurable discount ranges", "numbers2"),
+        num("Live operator transfer with warm handoff", "numbers2"),
+        num("Dedicated San Diego phone number (858 area code)", "numbers2"),
+        num("Post-call analytics dashboard (transcripts, sentiment, conversion tracking)", "numbers2"),
+        num("Testing, QA, and go-live support", "numbers2"),
         spacer(100),
 
-        heading("7.2 Projected ROI for Almco Plumbing", HeadingLevel.HEADING_2),
-        new Table({
-          width: { size: 9360, type: WidthType.DXA },
-          columnWidths: [5200, 4160],
-          rows: [
-            new TableRow({ children: [headerCell("Metric", 5200), headerCell("Projection", 4160)] }),
-            new TableRow({ children: [dataCell("Current missed calls per month (est.)", 5200), dataCell("40 \u2013 80", 4160)] }),
-            new TableRow({ children: [dataCell("AI-captured bookings per month", 5200, { shading: GRAY }), dataCell("28 \u2013 56 (at 70% rate)", 4160, { shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Average job value", 5200), dataCell("$400 \u2013 $500", 4160)] }),
-            new TableRow({ children: [dataCell("Additional monthly revenue", 5200, { shading: GRAY }), dataCell("$11,200 \u2013 $28,000", 4160, { bold: true, color: "27AE60", shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Additional annual revenue", 5200), dataCell("$134,400 \u2013 $336,000", 4160, { bold: true, color: "27AE60" })] }),
-            new TableRow({ children: [dataCell("AI agent monthly cost", 5200, { shading: GRAY }), dataCell("$500 \u2013 $1,500", 4160, { shading: GRAY })] }),
-            new TableRow({ children: [dataCell("Projected ROI", 5200, { bold: true }), dataCell("1,400% \u2013 3,700%", 4160, { bold: true, color: ACCENT })] }),
-          ],
-        }),
-
-        new Paragraph({ children: [new PageBreak()] }),
-
-        // ── TIMELINE ──
-        heading("8. Implementation Timeline"),
-        spacer(50),
-        new Table({
-          width: { size: 9360, type: WidthType.DXA },
-          columnWidths: [1400, 4200, 1900, 1860],
-          rows: [
-            new TableRow({ children: [headerCell("Phase", 1400), headerCell("Deliverables", 4200), headerCell("Duration", 1900), headerCell("Status", 1860)] }),
-            new TableRow({ children: [dataCell("1", 1400, { bold: true }), dataCell("Voice agent setup, prompt engineering, A/B testing", 4200), dataCell("1 week", 1900), dataCell("DONE", 1860, { bold: true, color: "27AE60" })] }),
-            new TableRow({ children: [dataCell("2", 1400, { bold: true, shading: GRAY }), dataCell("ServiceTitan OAuth + customer lookup integration", 4200, { shading: GRAY }), dataCell("1 \u2013 2 weeks", 1900, { shading: GRAY }), dataCell("NEXT", 1860, { bold: true, color: ACCENT_MED, shading: GRAY })] }),
-            new TableRow({ children: [dataCell("3", 1400, { bold: true }), dataCell("Scheduling Pro + real-time job booking", 4200), dataCell("1 \u2013 2 weeks", 1900), dataCell("Planned", 1860)] }),
-            new TableRow({ children: [dataCell("4", 1400, { bold: true, shading: GRAY }), dataCell("Membership check + call logging + post-call analytics", 4200, { shading: GRAY }), dataCell("1 week", 1900, { shading: GRAY }), dataCell("Planned", 1860, { shading: GRAY })] }),
-            new TableRow({ children: [dataCell("5", 1400, { bold: true }), dataCell("Testing, QA, sandbox validation, go-live", 4200), dataCell("1 \u2013 2 weeks", 1900), dataCell("Planned", 1860)] }),
-          ],
-        }),
-        spacer(50),
-        para("Total estimated timeline: 5 \u2013 8 weeks from ServiceTitan API access.", { bold: true }),
-
-        // ── WHAT WE NEED ──
-        heading("9. What We Need from Almco"),
-        numberItem("ServiceTitan API credentials (Client ID, Client Secret, App Key, Tenant ID)"),
-        numberItem("Access to ServiceTitan Scheduling Pro configuration"),
-        numberItem("List of job types and call reasons used in dispatch"),
-        numberItem("Preferred business hours and after-hours routing rules"),
-        numberItem("Test phone number for validation before go-live"),
+        h2("4.2 What's Included in Monthly Support ($500/mo)"),
+        bullet("Unlimited inbound calls \u2014 no per-call or per-minute fees"),
+        bullet("AI platform costs (voice engine, LLM, transcription, telephony)"),
+        bullet("Prompt tuning and optimization based on call performance"),
+        bullet("Knowledge base updates when services or pricing change"),
+        bullet("ServiceTitan integration monitoring and maintenance"),
+        bullet("Monthly performance report (calls handled, booking rate, sentiment)"),
+        bullet("Priority support with same-day response"),
         spacer(100),
 
-        // ── NEXT STEPS ──
-        heading("10. Next Steps"),
-        para("Phase 1 is already complete \u2014 two AI voice agents are live and ready for testing:"),
+        h2("4.3 What's NOT Included"),
+        bullet("ServiceTitan subscription fees (your existing plan)"),
+        bullet("Outbound calling campaigns (available as add-on, priced separately)"),
+        bullet("Custom CRM development beyond ServiceTitan integration"),
         spacer(50),
-        new Table({
-          width: { size: 9360, type: WidthType.DXA },
-          columnWidths: [3120, 3120, 3120],
-          rows: [
-            new TableRow({ children: [headerCell("Platform", 3120), headerCell("Phone Number", 3120), headerCell("Status", 3120)] }),
-            new TableRow({ children: [dataCell("VAPI", 3120, { bold: true }), dataCell("+1 (858) 251-5093", 3120, { bold: true }), dataCell("Live \u2014 call now", 3120, { bold: true, color: "27AE60" })] }),
-            new TableRow({ children: [dataCell("Retell AI", 3120, { bold: true, shading: GRAY }), dataCell("+1 (858) 943-2598", 3120, { bold: true, shading: GRAY }), dataCell("Live \u2014 call now", 3120, { bold: true, color: "27AE60", shading: GRAY })] }),
-          ],
-        }),
-        spacer(100),
-        para("To proceed with ServiceTitan integration, we need API credentials. Once received, Phase 2 begins immediately."),
+        p("No long-term contracts. Cancel monthly support anytime with 30 days notice. The setup work (agent, integrations, phone number) is yours to keep.", { i: true }),
+
+        pb(),
+
+        // ── 5. ROI ──
+        h1("5. Return on Investment"),
+        spacer(50),
+        kpi([ ["74%", "Plumbing calls go\nunanswered (industry)"], ["$125K+", "Annual revenue lost\nfrom missed calls"], ["70%", "AI booking rate\n(proven benchmark)"] ]),
         spacer(200),
-        accentLine(),
+
+        new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: [5200, 4160], rows: [
+          new TableRow({ children: [hCell("Metric", 5200), hCell("Almco Projection", 4160)] }),
+          new TableRow({ children: [dCell("Missed calls per month (estimated)", 5200), dCell("40 \u2013 80", 4160)] }),
+          new TableRow({ children: [dCell("AI-captured bookings per month (at 70% rate)", 5200, { bg: GRAY }), dCell("28 \u2013 56", 4160, { bg: GRAY })] }),
+          new TableRow({ children: [dCell("Average job value", 5200), dCell("$400 \u2013 $500", 4160)] }),
+          new TableRow({ children: [dCell("Additional monthly revenue", 5200, { bg: GRAY }), dCell("$11,200 \u2013 $28,000", 4160, { bold: true, color: GREEN, bg: GRAY })] }),
+          new TableRow({ children: [dCell("Additional annual revenue", 5200), dCell("$134,400 \u2013 $336,000", 4160, { bold: true, color: GREEN })] }),
+          new TableRow({ children: [dCell("Your annual cost (setup + 12 months)", 5200, { bg: GRAY }), dCell("$11,000", 4160, { bg: GRAY })] }),
+          new TableRow({ children: [dCell("Projected annual ROI", 5200, { bold: true }), dCell("1,100% \u2013 2,950%", 4160, { bold: true, color: ACCENT })] }),
+        ] }),
         spacer(100),
-        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Ready to eliminate missed calls and capture $134K+ in annual revenue?", font: "Arial", size: 24, bold: true, color: ACCENT })] }),
-        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 100 }, children: [new TextRun({ text: "Call either number above to experience the AI agent firsthand.", font: "Arial", size: 22, color: DARK })] }),
+        p("For context: a full-time human receptionist costs $35,000\u2013$45,000/year in San Diego, works limited hours, and still misses calls. The AI agent costs $11,000/year total and never misses a call.", { i: true }),
+
+        pb(),
+
+        // ── 6. TIMELINE ──
+        h1("6. Implementation Timeline"),
+        spacer(50),
+        new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: [800, 3800, 1800, 1400, 1560], rows: [
+          new TableRow({ children: [hCell("#", 800), hCell("Deliverables", 3800), hCell("Duration", 1800), hCell("Cost", 1400), hCell("Status", 1560)] }),
+          new TableRow({ children: [dCell("1", 800, { bold: true }), dCell("Voice agent setup, prompt engineering, knowledge base, A/B voice testing", 3800), dCell("Week 1", 1800), dCell("Included", 1400), dCell("DONE", 1560, { bold: true, color: GREEN })] }),
+          new TableRow({ children: [dCell("2", 800, { bold: true, bg: GRAY }), dCell("ServiceTitan OAuth + customer lookup + membership check", 3800, { bg: GRAY }), dCell("Week 2\u20133", 1800, { bg: GRAY }), dCell("Included", 1400, { bg: GRAY }), dCell("NEXT", 1560, { bold: true, color: ACCENT_MED, bg: GRAY })] }),
+          new TableRow({ children: [dCell("3", 800, { bold: true }), dCell("Scheduling Pro integration + real-time job booking + calendar sync", 3800), dCell("Week 3\u20134", 1800), dCell("Included", 1400), dCell("Planned", 1560)] }),
+          new TableRow({ children: [dCell("4", 800, { bold: true, bg: GRAY }), dCell("Pricing negotiation logic + discount engine + operator transfer", 3800, { bg: GRAY }), dCell("Week 4\u20135", 1800, { bg: GRAY }), dCell("Included", 1400, { bg: GRAY }), dCell("Planned", 1560, { bg: GRAY })] }),
+          new TableRow({ children: [dCell("5", 800, { bold: true }), dCell("Call logging, post-call analytics, testing, QA, go-live", 3800), dCell("Week 5\u20136", 1800), dCell("Included", 1400), dCell("Planned", 1560)] }),
+        ] }),
+        spacer(50),
+        p("Total: 5\u20136 weeks from receiving ServiceTitan API credentials. Phase 1 is already complete.", { bold: true }),
+
+        pb(),
+
+        // ── 7. WHAT WE NEED ──
+        h1("7. What We Need from Almco"),
+        spacer(50),
+        new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: [800, 4800, 3760], rows: [
+          new TableRow({ children: [hCell("#", 800), hCell("Item", 4800), hCell("Notes", 3760)] }),
+          new TableRow({ children: [dCell("1", 800, { bold: true }), dCell("ServiceTitan API credentials", 4800, { bold: true }), dCell("Client ID, Client Secret, App Key, Tenant ID", 3760)] }),
+          new TableRow({ children: [dCell("2", 800, { bold: true, bg: GRAY }), dCell("List of job types and call reasons", 4800, { bold: true, bg: GRAY }), dCell("As configured in your dispatch board", 3760, { bg: GRAY })] }),
+          new TableRow({ children: [dCell("3", 800, { bold: true }), dCell("Approved pricing ranges and discount limits", 4800, { bold: true }), dCell("Min/max prices per service, max discount %", 3760)] }),
+          new TableRow({ children: [dCell("4", 800, { bold: true, bg: GRAY }), dCell("Operator transfer phone number", 4800, { bold: true, bg: GRAY }), dCell("Number to forward when customer requests a live person", 3760, { bg: GRAY })] }),
+          new TableRow({ children: [dCell("5", 800, { bold: true }), dCell("Business hours and after-hours rules", 4800, { bold: true }), dCell("When to offer same-day vs. next-day appointments", 3760)] }),
+          new TableRow({ children: [dCell("6", 800, { bold: true, bg: GRAY }), dCell("Test phone number for QA", 4800, { bold: true, bg: GRAY }), dCell("Your cell or office line for test calls before go-live", 3760, { bg: GRAY })] }),
+        ] }),
+
+        spacer(200),
+
+        // ── 8. LIVE DEMO ──
+        h1("8. Live Demo \u2014 Try It Now"),
+        p("Phase 1 is already complete. Two AI voice agents are live and ready for you to call right now:"),
+        spacer(50),
+        new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: [2200, 2800, 2200, 2160], rows: [
+          new TableRow({ children: [hCell("Platform", 2200), hCell("Phone Number", 2800), hCell("Voice", 2200), hCell("Status", 2160)] }),
+          new TableRow({ children: [dCell("VAPI", 2200, { bold: true }), dCell("+1 (858) 251-5093", 2800, { bold: true }), dCell("ElevenLabs Sarah", 2200), dCell("LIVE", 2160, { bold: true, color: GREEN })] }),
+          new TableRow({ children: [dCell("Retell AI", 2200, { bold: true, bg: GRAY }), dCell("+1 (858) 943-2598", 2800, { bold: true, bg: GRAY }), dCell("ElevenLabs Anna", 2200, { bg: GRAY }), dCell("LIVE", 2160, { bold: true, color: GREEN, bg: GRAY })] }),
+        ] }),
+        spacer(50),
+        p("Call either number and test the agent yourself. Ask about services, pricing, scheduling \u2014 have a real conversation. This is what your customers will experience.", { i: true }),
+
+        spacer(200), line(), spacer(100),
+        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Ready to start?", font: "Arial", size: 28, bold: true, color: ACCENT })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 100 }, children: [new TextRun({ text: "Send us your ServiceTitan API credentials and we begin Phase 2 immediately.", font: "Arial", size: 22, color: DARK })] }),
+        spacer(100),
+        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "InLeads AI \u2014 San Diego, CA \u2014 hello@inleads.ai", font: "Arial", size: 18, color: ACCENT_MED })] }),
       ],
     },
   ],
@@ -425,6 +291,5 @@ const doc = new Document({
 Packer.toBuffer(doc).then((buffer) => {
   const outPath = "/Users/kp/Projects/my/almco/almco-plumbing-voice-assistent/docs/Almco_Commercial_Proposal.docx";
   fs.writeFileSync(outPath, buffer);
-  console.log("Document created:", outPath);
-  console.log("Size:", (buffer.length / 1024).toFixed(1), "KB");
+  console.log("Created:", outPath, `(${(buffer.length / 1024).toFixed(1)} KB)`);
 });
