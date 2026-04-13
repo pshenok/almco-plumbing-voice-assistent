@@ -1,0 +1,22 @@
+{
+  "agent_name": "Almco Plumbing Voice Agent",
+  "voice_id": "cartesia-Evie",
+  "language": "en-US",
+  "voice_speed": 1.0,
+  "volume": 1.0,
+  "interruption_sensitivity": 0.9,
+  "max_call_duration_ms": 600000,
+  "normalize_for_speech": true,
+  "handbook_config": {
+    "natural_filler_words": true,
+    "speech_normalization": true
+  },
+
+  "_llm_config": {
+    "model": "gpt-4o",
+    "model_temperature": 0.6,
+    "begin_message": "Hey... hi there! Thanks for calling Almco Plumbing, this is Sarah. What can I do for you?",
+    "start_speaker": "agent",
+    "_prompt_file": "prompt.md"
+  }
+}

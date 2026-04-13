@@ -87,14 +87,42 @@ Edit config/prompt.md or config/assistant.json
   → git commit + push
 ```
 
+## Retell AI (Alternative Platform)
+
+Same agent also deployed on Retell AI for A/B comparison.
+
+```bash
+# Setup
+./scripts/retell-setup.sh          # Create agent + buy number
+./scripts/retell-update.sh         # Update config/prompt
+./scripts/retell-test-call.sh +1XXXXXXXXXX  # Test call
+```
+
+Config: `config/retell-agent.json` (voice, volume, interruption settings)
+Prompt: shared `config/prompt.md` (same as VAPI)
+
+| Setting | Value |
+|---------|-------|
+| Voice | Cartesia Evie (American, conversational) |
+| LLM | GPT-4o |
+| Filler words | Enabled |
+| Interruption sensitivity | 0.9 (high) |
+| Volume | 1.0 |
+
 ## Requirements
 
-- `curl` and `jq` installed
-- `python3` available (for JSON escaping)
+- `curl`, `jq`, and `python3` installed
 - VAPI account with API key
+- Retell AI account with API key
 
 ## Current Deployment
 
+### VAPI
 - **Phone:** +1 (858) 251-5093
 - **Assistant ID:** 54462c2b-08e8-4db0-ab0a-fafb667d244a
 - **Dashboard:** https://dashboard.vapi.ai
+
+### Retell AI
+- **Phone:** +1 (858) 943-2598
+- **Agent ID:** agent_fdf75cbd2efae063db8a7ea645
+- **Dashboard:** https://dashboard.retellai.com
