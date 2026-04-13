@@ -1,22 +1,58 @@
 {
   "agent_name": "Almco Plumbing Voice Agent",
-  "voice_id": "cartesia-Evie",
+  "voice_id": "11labs-Anna",
+  "voice_model": "eleven_v3",
+  "fallback_voice_ids": ["cartesia-Evie"],
   "language": "en-US",
+
   "voice_speed": 1.0,
+  "voice_temperature": 1.2,
   "volume": 1.0,
-  "interruption_sensitivity": 0.9,
-  "max_call_duration_ms": 600000,
+
+  "enable_dynamic_voice_speed": true,
+  "enable_dynamic_responsiveness": true,
+  "responsiveness": 0.9,
+  "interruption_sensitivity": 0.8,
+
+  "enable_backchannel": true,
+  "backchannel_frequency": 0.6,
+  "backchannel_words": ["yeah", "uh-huh", "mm-hmm", "right", "I see", "sure"],
+
+  "ambient_sound": "call-center",
+  "ambient_sound_volume": 0.25,
+
   "normalize_for_speech": true,
+  "stt_mode": "accurate",
+  "denoising_mode": "noise-cancellation",
+
   "handbook_config": {
+    "default_personality": true,
     "natural_filler_words": true,
-    "speech_normalization": true
+    "high_empathy": true,
+    "echo_verification": true,
+    "nato_phonetic_alphabet": false,
+    "speech_normalization": true,
+    "smart_matching": true,
+    "ai_disclosure": false,
+    "scope_boundaries": true
   },
+
+  "begin_message_delay_ms": 1000,
+  "end_call_after_silence_ms": 25000,
+  "max_call_duration_ms": 1800000,
+  "reminder_trigger_ms": 8000,
+  "reminder_max_count": 2,
+
+  "boosted_keywords": ["Almco", "trenchless", "hydrojetting", "epoxy lining", "pipe bursting", "sewer camera", "repiping"],
+
+  "post_call_analysis_model": "gpt-4.1",
 
   "_llm_config": {
     "model": "gpt-4o",
-    "model_temperature": 0.6,
-    "begin_message": "Hey... hi there! Thanks for calling Almco Plumbing, this is Sarah. What can I do for you?",
+    "model_temperature": 0.4,
+    "begin_message": "Hey... hi, thanks for calling Almco Plumbing! This is Sarah — what can I do for you?",
     "start_speaker": "agent",
+    "knowledge_base_ids": ["knowledge_base_bac228ce038c6079"],
     "_prompt_file": "prompt.md"
   }
 }
