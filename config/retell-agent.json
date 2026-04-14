@@ -1,8 +1,8 @@
 {
   "agent_name": "Almco Plumbing Voice Agent",
-  "voice_id": "11labs-Anna",
-  "voice_model": "eleven_v3",
-  "fallback_voice_ids": ["cartesia-Evie"],
+  "voice_id": "11labs-Merritt",
+  "voice_model": "eleven_turbo_v2_5",
+  "fallback_voice_ids": ["cartesia-Savannah", "11labs-Grace"],
   "language": "en-US",
 
   "voice_speed": 1.0,
