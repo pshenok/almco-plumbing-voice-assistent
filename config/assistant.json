@@ -1,6 +1,6 @@
 {
   "name": "Almco Plumbing Voice Agent",
-  "firstMessage": "Hey... hi there! Thanks for calling Almco Plumbing, this is Sarah. What's going on?",
+  "firstMessage": "Hi there, thanks for calling Almco Plumbing! This is Sarah, the digital assistant — I'm here to take down your info and make sure our team gets back to you as soon as possible. What's going on with your plumbing?",
   "firstMessageMode": "assistant-speaks-first",
 
   "transcriber": {

@@ -11,15 +11,14 @@
 
   "enable_dynamic_voice_speed": true,
   "enable_dynamic_responsiveness": true,
-  "responsiveness": 0.9,
-  "interruption_sensitivity": 0.8,
+  "responsiveness": 0.6,
+  "interruption_sensitivity": 0.6,
 
   "enable_backchannel": true,
-  "backchannel_frequency": 0.6,
-  "backchannel_words": ["yeah", "uh-huh", "mm-hmm", "right", "I see", "sure"],
+  "backchannel_frequency": 0.4,
+  "backchannel_words": ["yeah", "okay", "got it", "mm-hmm", "sure"],
 
-  "ambient_sound": "call-center",
-  "ambient_sound_volume": 0.25,
+  "ambient_sound": null,
 
   "normalize_for_speech": true,
   "stt_mode": "accurate",
@@ -50,7 +49,7 @@
   "_llm_config": {
     "model": "gpt-4o",
     "model_temperature": 0.4,
-    "begin_message": "Hey... hi, thanks for calling Almco Plumbing! This is Sarah — what can I do for you?",
+    "begin_message": "Hi there, thanks for calling Almco Plumbing! This is Sarah, the digital assistant — I'm here to take down your info and make sure our team gets back to you as soon as possible. What's going on with your plumbing?",
     "start_speaker": "agent",
     "knowledge_base_ids": ["knowledge_base_bac228ce038c6079"],
     "_prompt_file": "prompt.md"
