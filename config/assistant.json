@@ -1,6 +1,6 @@
 {
   "name": "Almco Plumbing Voice Agent",
-  "firstMessage": "Hi there, thanks for calling Almco Plumbing! This is Sarah, the digital assistant — I'm here to take down your info and make sure our team gets back to you as soon as possible. What's going on with your plumbing?",
+  "firstMessage": "Hi there, thanks for calling Almco Plumbing! This is Sarah, the digital assistant — all our team members are on other calls right now, so I'm jumping in to grab your info. As soon as someone wraps up, they'll call you right back. What's going on?",
   "firstMessageMode": "assistant-speaks-first",
 
   "transcriber": {
@@ -14,12 +14,13 @@
   "model": {
     "provider": "openai",
     "model": "gpt-4o",
-    "temperature": 0.6,
+    "temperature": 0.5,
     "maxTokens": 200,
     "messages": [
       {
         "role": "system",
-        "content": "__PROMPT_PLACEHOLDER__"
+        "content": "__PROMPT_PLACEHOLDER__",
+        "_comment": "Prompt is loaded from config/prompt-daytime.md by update script. Switch mode via scripts/retell-set-mode.sh or manually replace with prompt-afterhours.md"
       }
     ]
   },
@@ -44,12 +45,12 @@
   "endCallMessage": "Alright, thanks for calling! Take care.",
 
   "startSpeakingPlan": {
-    "waitSeconds": 0.3
+    "waitSeconds": 0.8
   },
 
   "stopSpeakingPlan": {
     "numWords": 2,
-    "voiceSeconds": 0.2,
+    "voiceSeconds": 0.3,
     "backoffSeconds": 0.8
   }
 }

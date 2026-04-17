@@ -49,9 +49,11 @@
   "_llm_config": {
     "model": "gpt-4o",
     "model_temperature": 0.4,
-    "begin_message": "Hi there, thanks for calling Almco Plumbing! This is Sarah, the digital assistant — I'm here to take down your info and make sure our team gets back to you as soon as possible. What's going on with your plumbing?",
+    "begin_message": "Hi there, thanks for calling Almco Plumbing! This is Sarah, the digital assistant — all our team members are on other calls right now, so I'm jumping in to grab your info. As soon as someone wraps up, they'll call you right back. What's going on?",
     "start_speaker": "agent",
     "knowledge_base_ids": ["knowledge_base_bac228ce038c6079"],
-    "_prompt_file": "prompt.md"
+    "_mode": "daytime",
+    "_prompt_file": "prompt-daytime.md",
+    "_note": "Switch between modes with scripts/retell-set-mode.sh [daytime|afterhours]"
   }
 }

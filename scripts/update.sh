@@ -3,7 +3,8 @@ set -euo pipefail
 
 # ─────────────────────────────────────────────
 # Almco Plumbing — Update Existing VAPI Agent
-# Quick update: re-applies config + prompt
+# Usage: ./scripts/update.sh [daytime|afterhours]
+# Default: daytime
 # ─────────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -12,11 +13,20 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
+YELLOW='\033[1;33m'
 NC='\033[0m'
+
+MODE="${1:-daytime}"
+if [[ "$MODE" != "daytime" && "$MODE" != "afterhours" ]]; then
+  echo -e "${RED}Usage:${NC} $0 [daytime|afterhours]"
+  exit 1
+fi
 
 log()  { echo -e "${CYAN}[update]${NC} $1"; }
 ok()   { echo -e "${GREEN}[   ok ]${NC} $1"; }
 err()  { echo -e "${RED}[ error]${NC} $1" >&2; }
+
+log "Mode: ${YELLOW}${MODE}${NC}"
 
 # ── Load .env ──
 ENV_FILE="$PROJECT_DIR/.env"
@@ -42,16 +52,27 @@ log "Reading config and prompt..."
 
 PROMPT_CONTENT=$(python3 -c "
 import json
-with open('$PROJECT_DIR/config/prompt.md', 'r') as f:
+with open('$PROJECT_DIR/config/prompt-$MODE.md', 'r') as f:
     print(json.dumps(f.read()))
 ")
 
-CONFIG_JSON=$(cat "$PROJECT_DIR/config/assistant.json" | python3 -c "
-import json, sys
-config = json.load(sys.stdin)
-prompt = json.loads($PROMPT_CONTENT)
-config['model']['messages'][0]['content'] = prompt
-json.dump(config, sys.stdout)
+# Mode-specific first message
+if [[ "$MODE" == "daytime" ]]; then
+  FIRST_MSG="Hi there, thanks for calling Almco Plumbing! This is Sarah, the digital assistant — all our team members are on other calls right now, so I'm jumping in to grab your info. As soon as someone wraps up, they'll call you right back. What's going on?"
+else
+  FIRST_MSG="Hi there, thanks for calling Almco Plumbing! This is Sarah, the after-hours digital assistant. Our team is off for the night, but I'm here to take down your info so they can call you back first thing in the morning. What's going on?"
+fi
+
+CONFIG_JSON=$(python3 -c "
+import json
+with open('$PROJECT_DIR/config/assistant.json') as f:
+    config = json.load(f)
+with open('$PROJECT_DIR/config/prompt-$MODE.md') as f:
+    config['model']['messages'][0]['content'] = f.read()
+# Remove comment field, set firstMessage
+config['model']['messages'][0].pop('_comment', None)
+config['firstMessage'] = '''$FIRST_MSG'''
+print(json.dumps(config))
 ")
 
 # ── PATCH assistant ──
